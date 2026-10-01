@@ -88,36 +88,47 @@ The screen is divided into 3 equal columns.
 ```
 
 ## File Roles
+# Xiaomi Bootloader Unlock Quota Helper (Termux & Desktop)
 
-- `NScript.py`: active core timing and unlock request logic (recommended).
-- `Script.py`: legacy leftover kept for reference only. Due to server-side changes, this should not be used for active runs.
-- `GetTokens.py`: Windows token extraction and multi-window launcher.
-- `GetTokens for Gnome on Linux by Jenna-66.py`: Linux/GNOME variant of token extraction.
-- `AutoStart.bat`: Windows one-click launcher — detects the Python executable (`py` / `python`) and calls `AutoStart.py`.
-- `AutoStart.py`: bootstrap launcher that starts `AutoJobs.py` in a new dedicated console window and places it in column 1, then closes itself.
-- `AutoJobs.py`: main workflow — reads credentials from `account.txt`, auto-logs into Xiaomi Community in Chrome and Firefox, extracts tokens, updates `token.txt`, performs a best-effort pre-refresh logout for previous Chrome/Firefox sessions, and manages 4 `NScript.py` windows.
-- `token.txt`: token storage (one token per line).
-- `timeshift.txt`: per-window timing offset values (milliseconds).
-- `account.txt` / `account_default.txt`: account credential handling for `AutoJobs.py`.
-- `Ping.bat`: manual latency checks for listed servers.
+This project automates token collection and timed bootloader unlock requests for Xiaomi devices (Global flow), based on Xiaomi Community web/API behavior.
 
-## Alternative Token Collection
+> [!WARNING]
+> Use this project strictly at your own risk and your own responsibility.
+> Even if queue/add-authorize appears successful, authorization is not guaranteed and may be coincidence.
+> Constant, never-ending connected sessions might be noticed on Xiaomi's side, so avoid unnecessary nonstop activity and keep sessions practical.
+> Current mitigation is experimental: this logout flow is an attempt to reduce long-lived sessions, and each refresh cycle uses a randomized timeout (`REFRESH_INTERVAL` +/-20%) to avoid fixed periodic behavior.
 
-- `GetTokens.py` (Windows) and `GetTokens for Gnome on Linux by Jenna-66.py` (Linux) are still available as manual token-collection alternatives.
+---
 
-## Notes
+## What This Program Does
 
-- `token.txt` and `timeshift.txt` line order matters: each script window reads the line matching its token row number.
-- Expired `new_bbs_serviceToken` values will fail and must be refreshed.
-- Pre-refresh logout uses the generic endpoint `https://sgp-api.buy.mi.com/bbs/api/global/user/login-out` with a user-independent callback (`https://c.mi.com/global/`), not a fixed user profile URL.
-- A successful queue/add-authorize result can still be coincidental; collect multiple confirmations before treating it as guaranteed behavior.
-- Long-running, constantly connected browser/API sessions may be more visible from Xiaomi's side; use responsibly and avoid unnecessary nonstop activity.
-- This project uses unofficial automation around public web/API behavior; use responsibly and at your own risk.
+The toolchain is built around two main steps:
 
-## Credits and Sources
+1. **Token Collection**: Collect valid login tokens from Xiaomi Community (`new_bbs_serviceToken` and `popRunToken`).
+2. **Quota Timing**: Send a precisely timed unlock request to Xiaomi's API around Beijing midnight (`UTC+8`) to maximize chances against daily quota limits.
 
-- Original code/source attribution in project scripts:
-  - `GetTokens V2 - by byBestix on xdaforums` (see `GetTokens.py` and Linux variant).
-- Linux GNOME adaptation file naming credits: `GetTokens for Gnome on Linux by Jenna-66.py`.
-- XDA source thread:
-  - https://xdaforums.com/t/how-to-unlock-bootloader-on-xiaomi-hyperos-all-devices-except-cn.4654009/
+---
+
+## Installation & Usage
+
+### 📱 Android (Termux Setup)
+
+To set up and run the environment in Termux:
+
+```bash
+# Update packages and install prerequisites
+pkg update && pkg upgrade -y
+pkg install python git clang make -y
+
+# Clone repository
+git clone [https://github.com/matedon/Mentoxx.newtool.git](https://github.com/matedon/Mentoxx.newtool.git)
+cd Mentoxx.newtool
+
+# Install Python requirements
+pip install -r requirements.txt
+
+# Run token extractor
+python GetTokens.py
+
+# Or run the main tool directly
+python Mentoxxnew.py
