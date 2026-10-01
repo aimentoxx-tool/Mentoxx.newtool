@@ -31,7 +31,7 @@ pkg update && pkg upgrade -y
 pkg install python git clang make -y
 
 # Clone repository
-git clone [https://github.com/matedon/Mentoxx.newtool.git](https://github.com/matedon/Mentoxx.newtool.git)
+git clone https://github.com/aimentoxx-tool/Mentoxx.newtool.git
 cd Mentoxx.newtool
 
 # Install Python requirements
